@@ -1,0 +1,8 @@
+Numero de vértices: 8
+Numero de arestas: 5
+Grau mínimo: 1
+Grau máximo: 2
+Grau médio: 1.42857
+Grau mediano: 1
+Componente : 1 Tamanho: 3
+Componente : 2 Tamanho: 4
