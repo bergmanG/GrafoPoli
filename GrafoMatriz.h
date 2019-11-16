@@ -13,5 +13,6 @@ public:
 	int diametro();
 	float** dijkstra(int);
 	float** prim(int);
+	float* bellmanford(int t);
 };
 

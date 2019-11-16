@@ -259,3 +259,21 @@ float** GrafoMatriz::prim(int inicial) {
 	delete[] custo;
 	return pai;
 }
+
+float* GrafoMatriz::bellmanford(int t) {
+	float* M = new float[num_vertices];
+	for (int i = 0; i < num_vertices; i++) {
+		M[i] = FLT_MAX;
+	}
+	M[t] = 0;
+
+	for (int v = 0; v < num_vertices; v++) {
+		for (int w = 0; w < num_vertices; w++) {
+			if (matriz[v][w]) {
+				float c = matrizpeso[v][w];
+				M[v] = min(M[v], M[w] + c);
+			}
+		}
+	}
+	return M;
+}

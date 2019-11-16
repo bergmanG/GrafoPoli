@@ -232,3 +232,20 @@ float** GrafoAdjacencia::prim(int inicial) {
 	delete[] custo;
 	return pai;
 }
+
+float* GrafoAdjacencia::bellmanford(int t) {
+	float* M = new float[num_vertices];
+	for (int i = 0; i < num_vertices; i++) {
+		M[i] = FLT_MAX;
+	}
+	M[t] = 0;
+
+	for (int v = 0; v < num_vertices; v++) {
+		for (int w = 0; w < adjaListPeso[v].size(); w++) {
+			float c = adjaListPeso[v][w].second;
+			w = adjaListPeso[v][w].first;
+			M[v] = min(M[v], M[w] + c);
+		}
+	}
+	return M;
+}

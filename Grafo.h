@@ -33,5 +33,7 @@ public:
 	float excentricidade(int u);
 	float* grau_info();
 	bool escreveDisco_mst(string);
+	float max(float, float);
+	float min(float, float);
 };
 

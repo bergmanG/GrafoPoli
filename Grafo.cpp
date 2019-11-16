@@ -157,3 +157,12 @@ bool Grafo::escreveDisco_mst(string file) {
 	return true;
 }
 
+float Grafo::max(float a, float b) {
+	if (a > b) return a;
+	else return b;
+}
+
+float Grafo::min(float a, float b) {
+	if (a < b) return a;
+	else return b;
+}
