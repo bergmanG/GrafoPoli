@@ -277,3 +277,11 @@ float* GrafoMatriz::bellmanford(int t) {
 	}
 	return M;
 }
+
+float** GrafoMatriz::distancia() {
+	float** dist = new float*[num_vertices];
+	for (int i = 0; i < num_vertices; i++) {
+		dist[i] = bellmanford(i);
+	}
+	return dist;
+}

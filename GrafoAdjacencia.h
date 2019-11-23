@@ -13,5 +13,6 @@ public:
 	float** dijkstra(int);
 	float** prim(int);
 	float* bellmanford(int t);
+	float** distancia();
 };
 
