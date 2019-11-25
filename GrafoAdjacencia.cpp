@@ -239,16 +239,27 @@ float** GrafoAdjacencia::prim(int inicial) {
 
 float* GrafoAdjacencia::bellmanford(int t) {
 	float* M = new float[num_vertices];
+	bool alt = false;
 	for (int i = 0; i < num_vertices; i++) {
 		M[i] = FLT_MAX;
 	}
 	M[t] = 0;
 	for (int i = 1; i < num_vertices - 1 ;i++) {
+		if (i > 1 && !alt) return M;
+		if (M[t] < 0) {
+			ciclo_negativo = true;
+			return M;
+		}
+		alt = false;
 		for (int v = 1; v < num_vertices; v++) {
 			for (int w = 0; w < adjaListPeso[v].size(); w++) {
 				float peso = adjaListPeso[v][w].second;
 				int vizinho = adjaListPeso[v][w].first;
+				int ultimo = M[v];
 				M[v] = min(M[v], M[vizinho] + peso);
+				if (ultimo != M[v]) {
+					alt = true;
+				}
 			}
 		}
 	}
