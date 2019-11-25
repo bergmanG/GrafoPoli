@@ -1,5 +1,5 @@
 #include "GrafoMatriz.h"
-GrafoMatriz::GrafoMatriz(string file, bool peso) {
+GrafoMatriz::GrafoMatriz(string file, bool peso, bool direcao) {
 	ifstream myfile(file);
 	myfile >> num_vertices;
 	num_vertices++;
@@ -23,28 +23,33 @@ GrafoMatriz::GrafoMatriz(string file, bool peso) {
 
 	if (peso) {
 		while (myfile >> v1 >> v2 >> v3) {
+
 			matriz[v1][v2] = true;
-			matriz[v2][v1] = true;
 			matrizpeso[v1][v2] = v3;
-			matrizpeso[v2][v1] = v3;
 			graus[v1]++;
-			graus[v2]++;
+			if (!direcao) {
+				matriz[v2][v1] = true;
+				matrizpeso[v2][v1] = v3;
+				graus[v2]++;
+			}
 			num_arestas++;
 		}
 	}
 	else {
 		while (myfile >> v1 >> v2) {
 			matriz[v1][v2] = true;
-			matriz[v2][v1] = true;
 			graus[v1]++;
-			graus[v2]++;
+			if (!direcao) {
+				matriz[v2][v1] = true;
+				graus[v2]++;
+			}
 			num_arestas++;
 		}
 	}
 
 
 	myfile.close();
-	//checa_bipartido(0);
+	checa_bipartido(1);
 }
 int** GrafoMatriz::bfs_busca(int inicial) {
 	list<int> fila;
@@ -267,11 +272,21 @@ float* GrafoMatriz::bellmanford(int t) {
 	}
 	M[t] = 0;
 
-	for (int v = 0; v < num_vertices; v++) {
-		for (int w = 0; w < num_vertices; w++) {
+	for (int i = 1; i < num_vertices - 1; i++) {
+		for (int v = 1; v < num_vertices; v++) {
+			for (int w = 1; w < num_vertices; w++) {
+				if (matriz[v][w]) {
+					M[v] = min(M[v], M[w] + matrizpeso[v][w]);
+				}
+			}
+		}
+	}
+	for (int v = 1; v < num_vertices; v++) {
+		for (int w = 1; w < num_vertices; w++) {
 			if (matriz[v][w]) {
-				float c = matrizpeso[v][w];
-				M[v] = min(M[v], M[w] + c);
+				if (M[w] + matrizpeso[v][w] < M[v]) {
+					ciclo_negativo = true;
+				}
 			}
 		}
 	}
@@ -284,4 +299,120 @@ float** GrafoMatriz::distancia() {
 		dist[i] = bellmanford(i);
 	}
 	return dist;
+}
+bool GrafoMatriz::checa_bipartido(int inicial) {
+	list<int> fila;
+	fila.push_back(inicial);
+	int* cor = new int[num_vertices] {0};
+
+	cor[inicial] = 1;
+	int v;
+	while (fila.size() != 0) {
+		v = fila.front();
+		fila.pop_front();
+		for (int i = 1; i < num_vertices; i++) {
+			if (matriz[v][i]) {
+				if (cor[i] == 0)
+				{
+					cor[i] = (cor[v] % 2) + 1;
+					fila.push_back(i);
+				}
+				else if (cor[i] == cor[v])
+				{
+					bipartido = false;
+					return 0;
+				}
+			}
+		}
+
+	}
+	for (int i = 0; i < num_vertices; i++) {
+		if (cor[i] == 1)
+		{
+			conjuntos[0].push_back(i);
+		}
+		else if (cor[i] == 2) {
+			conjuntos[1].push_back(i);
+		}
+	}
+	bipartido = true;
+	return true;
+}
+list<int>* GrafoMatriz::encontra_caminho(vector<pair<int, bool>>* grafo_residual, bool* expostos) {
+	list<int>* m_aumentante = new list<int>;
+	list<int> pilha;
+	bool* explorado = new bool[num_vertices];
+	int* pai = new int[num_vertices] {0};
+	for (int i = 0; i < conjuntos[0].size(); i++) {
+		int v = conjuntos[0][i];
+		if (expostos[v]) {
+			pilha.push_back(v);
+		}
+	}
+	bool prox_saturada = false;
+	int v;
+	while (pilha.size() != 0) {
+		fill(explorado, explorado + num_vertices, 0);
+		v = pilha.back();
+		pilha.pop_back();
+		for (int i = 0; i < grafo_residual[v].size(); i++) {
+			if (grafo_residual[v][i].second == prox_saturada) {
+				int r = grafo_residual[v][i].first;
+				if (!explorado[r]) {
+					pilha.push_back(r);
+					pai[r] = v;
+					explorado[r] = 1;
+					if (expostos[r]) {
+						delete[] explorado;
+						expostos[r] = false;
+						do {
+							m_aumentante->push_front(r);
+							r = pai[r];
+						} while (r != 0);
+						expostos[m_aumentante->front()] = false;
+						return m_aumentante;
+					}
+				}
+			}
+		}
+		prox_saturada = !prox_saturada;
+	}
+	delete[]explorado;
+	return 0;
+}
+vector<pair<int, bool>>* GrafoMatriz::hopcraft() {
+	vector<pair<int, bool>>* grafo_residual = new vector<pair<int, bool>>[num_vertices];
+	for (int i = 0; i < conjuntos[0].size(); i++) {
+		int v = conjuntos[0][i];
+		for (int j = 1; j < num_vertices; j++) {
+			if (matriz[v][j]) { 
+				grafo_residual[v].push_back(make_pair(j, false)); 
+			}
+		}
+	}
+	bool* expostos = new bool[num_vertices];
+	fill(expostos, expostos + num_vertices, 1);
+	while (true) {
+		list<int>* m_aumentante = encontra_caminho(grafo_residual, expostos);
+		if (m_aumentante == 0) {
+			break;
+		}
+		auto u = m_aumentante->begin();
+		do {
+			for (int i = 0; i < grafo_residual[*u].size(); i++) {
+				if (grafo_residual[*u][i].first == *(next(u, 1))) {
+					grafo_residual[*u][i].second = !grafo_residual[*u][i].second;
+				}
+			}
+			u++;
+		} while (u != --(m_aumentante->end()));
+		delete m_aumentante;
+	}
+	for (int i = 1; i < num_vertices; i++) {
+		if (!expostos[i]) {
+			cout << i << endl;
+		}
+	}
+	delete[] expostos;
+	return grafo_residual;
 }

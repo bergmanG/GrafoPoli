@@ -166,3 +166,47 @@ float Grafo::min(float a, float b) {
 	if (a < b) return a;
 	else return b;
 }
+bool Grafo::escrever_emparelhamento(string file) {
+	ofstream myfile(file);
+	if (!myfile.is_open())
+	{
+		return false;
+	}
+	int emp = 0;
+	vector<pair<int, bool>>* gr = hopcraft();
+	for (int i = 0; i < conjuntos[0].size(); i++) {
+		int v = conjuntos[0][i];
+		for (int j = 0; j < gr[v].size(); j++) {
+			if (gr[v][j].second) {
+				emp++;
+				myfile << v << " " << gr[v][j].first << endl;
+			}
+		}
+	}
+	myfile << "Emparelhamento: " << emp;
+	myfile.close();
+	//delete gr;
+	return true;
+}
+bool Grafo::escrever_bellmanford(string file) {
+	ofstream myfile(file);
+	if (!myfile.is_open())
+	{
+		return false;
+	}
+	float** bf = distancia();
+	if (ciclo_negativo) {
+		myfile << "Ciclo negativo: true" << endl;
+	}
+	else {
+		myfile << "Ciclo negativo: false" << endl;
+	}
+	for (int i = 1; i < num_vertices; i++) {
+		for (int j = 1; j < num_vertices; j++) {
+			myfile << i << " " << j << " dist: " << bf[i][j] << endl;
+		}
+	}
+	myfile.close();
+	//delete gr;
+	return true;
+}

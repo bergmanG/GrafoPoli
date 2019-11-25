@@ -3,7 +3,7 @@
 class GrafoMatriz : public Grafo
 {
 public:
-	GrafoMatriz(string, bool peso);
+	GrafoMatriz(string, bool peso,bool direcao);
 	float** matrizpeso;
 	bool** matriz;
 
@@ -15,5 +15,8 @@ public:
 	float** prim(int);
 	float* bellmanford(int t);
 	float** distancia();
+	bool checa_bipartido(int inicial);
+	list<int>* encontra_caminho(vector<pair<int, bool>>* grafo_residual, bool* expostos);
+	vector<pair<int, bool>>* hopcraft();
 };
 
