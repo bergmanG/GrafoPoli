@@ -15,8 +15,9 @@ public:
 	float** prim(int);
 	float* bellmanford(int t);
 	float** distancia();
-	bool checa_bipartido(int inicial);
-	list<int>* encontra_caminho(vector<pair<int, bool>>* grafo_residual, bool* expostos);
-	vector<pair<int, bool>>* hopcraft();
+	bool checa_bipartido(int);
+	int hopcroft();
+	bool dfsHopcroft(int u, int* pairA, int* pairB, int* dist);
+	bool bfsHopcroft(int* pairA, int* pairB, int* dist);
 };
 
