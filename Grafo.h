@@ -29,8 +29,8 @@ public:
 	virtual float** prim(int) = 0;
 	virtual bool checa_bipartido(int) = 0;
 	virtual float* bellmanford(int t) = 0;
-	virtual vector<pair<int, bool>>* hopcraft()=0;
 	virtual float** distancia() = 0;
+	virtual int hopcroft() = 0;
 	
 	list<float>min_caminho(int, int);
 	bool escreverGrafoInfo(string file);
@@ -45,6 +45,8 @@ public:
 	float max(float, float);
 	float min(float, float);
 };
+
+
 
 
 
