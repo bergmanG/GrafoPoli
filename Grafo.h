@@ -30,7 +30,7 @@ public:
 	virtual bool checa_bipartido(int) = 0;
 	virtual float* bellmanford(int t) = 0;
 	virtual float** distancia() = 0;
-	virtual int hopcroft() = 0;
+	virtual int* hopcroft() = 0;//retorna vetor com pares. indice 0 é o emparelhamento maximo
 	
 	list<float>min_caminho(int, int);
 	bool escreverGrafoInfo(string file);
@@ -45,8 +45,4 @@ public:
 	float max(float, float);
 	float min(float, float);
 };
-
-
-
-
 
