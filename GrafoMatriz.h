@@ -16,7 +16,7 @@ public:
 	float* bellmanford(int t);
 	float** distancia();
 	bool checa_bipartido(int);
-	int hopcroft();
+	int* hopcroft();//retorna vetor com pares. indice 0 é o emparelhamento maximo
 	bool dfsHopcroft(int u, int* pairA, int* pairB, int* dist);
 	bool bfsHopcroft(int* pairA, int* pairB, int* dist);
 };
