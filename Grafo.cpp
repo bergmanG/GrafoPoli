@@ -10,11 +10,11 @@ bool Grafo::escreverGrafoInfo(string file) {
 	}
 	float* infos = this->grau_info();
 
-	myfile << "Numero de vértices: " << num_vertices << endl;
+	myfile << "Numero de vÃ©rtices: " << num_vertices << endl;
 	myfile << "Numero de arestas: " << num_arestas << endl;
-	myfile << "Grau mínimo: " << infos[0] << endl;
-	myfile << "Grau máximo: " << infos[1] << endl;
-	myfile << "Grau médio: " << infos[2] << endl;
+	myfile << "Grau minimo: " << infos[0] << endl;
+	myfile << "Grau maximo: " << infos[1] << endl;
+	myfile << "Grau medio: " << infos[2] << endl;
 	myfile << "Grau mediano: " << infos[3] << endl;
 	vector<vector<int>> cc_info = bfs_conexa();
 	int* ccs = new int[cc_info.size()];
@@ -39,9 +39,9 @@ bool Grafo::escreveDisco_bfs(int inicial, string file) {
 	{
 		return false;
 	}
-	myfile << "Vértice: 1 Pai: RAIZ Nível: 0\n";
+	myfile << "Vertice: 1 Pai: RAIZ Nivel: 0\n";
 	for (int i = 1; i < num_vertices; i++) {
-		myfile << "Vértice: " << i << " Pai: " << bfs_info[0][i] << " Nível: " << bfs_info[1][i] << "\n";
+		myfile << "Vertice: " << i << " Pai: " << bfs_info[0][i] << " Nivel: " << bfs_info[1][i] << "\n";
 	}
 	myfile.close();
 	delete[] bfs_info[0];
@@ -55,9 +55,9 @@ bool Grafo::escreveDisco_dfs(int inicial, string file) {
 	{
 		return false;
 	}
-	myfile << "Vértice: 1 Pai: RAIZ Nível: 0\n";
+	myfile << "Vertice: 1 Pai: RAIZ Nivel: 0\n";
 	for (int i = 1; i < num_vertices; i++) {
-		myfile << "Vértice: " << i << " Pai: " << dfs_info[0][i] << " Nível: " << dfs_info[1][i] << "\n";
+		myfile << "Vertice: " << i << " Pai: " << dfs_info[0][i] << " Nivel: " << dfs_info[1][i] << "\n";
 	}
 	myfile.close();
 	delete[] dfs_info[0];
@@ -106,7 +106,7 @@ float* Grafo::grau_info() {
 	}
 	return resultados;
 }
-//ultimo elemento é a distancia
+//ultimo elemento Ã© a distancia
 list<float> Grafo::min_caminho(int v1, int v2) {
 	list<float> caminho;
 	if (peso) {
