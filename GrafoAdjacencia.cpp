@@ -263,15 +263,15 @@ float* GrafoAdjacencia::bellmanford(int t) {
 			}
 		}
 	}
-		for (int v = 1; v < num_vertices; v++) {
-			for (int w = 0; w < adjaListPeso[v].size(); w++) {
-				float peso = adjaListPeso[v][w].second;
-				int vizinho = adjaListPeso[v][w].first;
-				if (M[vizinho] + peso < M[v]) {
-					ciclo_negativo = true;
-				}
+	for (int v = 1; v < num_vertices; v++) {
+		for (int w = 0; w < adjaListPeso[v].size(); w++) {
+			float peso = adjaListPeso[v][w].second;
+			int vizinho = adjaListPeso[v][w].first;
+			if (M[vizinho] + peso < M[v]) {
+				ciclo_negativo = true;
 			}
 		}
+	}
 	return M;
 }
 
@@ -318,7 +318,7 @@ bool GrafoAdjacencia::checa_bipartido(int inicial) {
 	cout << "bipartido\n";
 	return true;
 }
-int GrafoAdjacencia::hopcroft()
+int* GrafoAdjacencia::hopcroft()
 {
 	int* pairA = new int[num_vertices];
 	int* pairB = new int[num_vertices];
@@ -327,9 +327,8 @@ int GrafoAdjacencia::hopcroft()
 	for (int i = 0; i < num_vertices; i++)
 	{
 		pairA[i] = 0;
-	}
-	for (int i = 0; i < num_vertices; i++)
 		pairB[i] = 0;
+	}
 
 	int result = 0;
 
@@ -341,7 +340,8 @@ int GrafoAdjacencia::hopcroft()
 				result++;
 		}
 	}
-	return result;
+	pairA[0] = result;
+	return pairA;
 }
 bool GrafoAdjacencia::bfsHopcroft(int* pairA, int* pairB, int* dist)
 {
