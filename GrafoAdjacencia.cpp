@@ -239,28 +239,24 @@ float** GrafoAdjacencia::prim(int inicial) {
 
 float* GrafoAdjacencia::bellmanford(int t) {
 	float* M = new float[num_vertices];
-	bool alt = false;
 	for (int i = 0; i < num_vertices; i++) {
 		M[i] = FLT_MAX;
 	}
 	M[t] = 0;
+	bool continuar = false;
 	for (int i = 1; i < num_vertices - 1 ;i++) {
-		if (i > 1 && !alt) return M;
-		if (M[t] < 0) {
-			ciclo_negativo = true;
-			return M;
-		}
-		alt = false;
 		for (int v = 1; v < num_vertices; v++) {
 			for (int w = 0; w < adjaListPeso[v].size(); w++) {
 				float peso = adjaListPeso[v][w].second;
 				int vizinho = adjaListPeso[v][w].first;
-				int ultimo = M[v];
-				M[v] = min(M[v], M[vizinho] + peso);
-				if (ultimo != M[v]) {
-					alt = true;
+				if (M[vizinho] + peso < M[v]) {
+					M[v] = M[vizinho] + peso;
+					continuar = true;
 				}
 			}
+		}
+		if (!continuar) {
+			break;
 		}
 	}
 		for (int v = 1; v < num_vertices; v++) {
@@ -281,77 +277,6 @@ float** GrafoAdjacencia::distancia() {
 		dist[i] = bellmanford(i);
 	}
 	return dist;
-}
-list<int>* GrafoAdjacencia::encontra_caminho(vector<pair<int, bool>>* grafo_residual, bool* expostos) {
-	list<int>* m_aumentante = new list<int>;
-	list<int> pilha;
-	bool* explorado = new bool[num_vertices];
-	int* pai = new int[num_vertices] {0};
-	for (int i = 0; i < conjuntos[0].size(); i++) {
-		int v = conjuntos[0][i];
-		if (expostos[v]) {
-			pilha.push_back(v);
-		}
-	}
-	bool prox_saturada = false;
-	int v;
-	while (pilha.size() != 0) {
-		fill(explorado, explorado + num_vertices, 0);
-		v = pilha.back();
-		pilha.pop_back();
-		for (int i = 0; i < grafo_residual[v].size(); i++) {
-			if (grafo_residual[v][i].second == prox_saturada) {
-				int r = grafo_residual[v][i].first;
-				if (!explorado[r]) {
-					pilha.push_back(r);
-					pai[r] = v;
-					explorado[r] = 1;
-					if (expostos[r]) {
-						delete[] explorado;
-						expostos[r] = false;
-						do {
-							m_aumentante->push_front(r);
-							r = pai[r];
-						} while (r != 0);
-						expostos[m_aumentante->front()] = false;
-						return m_aumentante;
-					}
-				}
-			}
-		}
-		prox_saturada = !prox_saturada;
-	}
-	delete[]explorado;
-	return 0;
-}
-vector<pair<int, bool>>* GrafoAdjacencia::hopcraft() {
-	vector<pair<int, bool>>* grafo_residual = new vector<pair<int, bool>>[num_vertices];
-	for (int i = 0; i < conjuntos[0].size(); i++) {
-		int v = conjuntos[0][i];
-		for (int j = 0; j < adjaListPeso[v].size(); j++) {
-			grafo_residual[v].push_back(make_pair(adjaListPeso[v][j].first, false));
-		}
-	}
-	bool* expostos = new bool[num_vertices];
-	fill(expostos, expostos + num_vertices, 1);
-	while(true) {
-		list<int>* m_aumentante = encontra_caminho(grafo_residual,expostos);
-		if (m_aumentante == 0) {
-			break;
-		}
-		auto u = m_aumentante->begin();
-		do {
-			for (int i = 0; i< grafo_residual[*u].size(); i++) {
-				if (grafo_residual[*u][i].first == *(next(u,1))) {
-					grafo_residual[*u][i].second = !grafo_residual[*u][i].second;
-				}
-			}
-			u++;
-		} while (u != --(m_aumentante->end()));
-		delete m_aumentante;
-	}
-	delete[] expostos;
-	return grafo_residual;
 }
 bool GrafoAdjacencia::checa_bipartido(int inicial) {
 	list<int> fila;
@@ -387,5 +312,88 @@ bool GrafoAdjacencia::checa_bipartido(int inicial) {
 	}
 	bipartido = true;
 	cout << "bipartido\n";
+	return true;
+}
+int GrafoAdjacencia::hopcroft()
+{
+	int* pairA = new int[num_vertices];
+	int* pairB = new int[num_vertices];
+	int* dist = new int[num_vertices];
+
+	for (int i = 0; i < num_vertices; i++)
+	{
+		pairA[i] = 0;
+	}
+	for (int i = 0; i < num_vertices; i++)
+		pairB[i] = 0;
+
+	int result = 0;
+
+	while (bfsHopcroft(pairA, pairB, dist))
+	{
+		for (int u = 1; u <= conjuntos[0].size(); u++) {
+
+			if (pairA[u] == 0 && dfsHopcroft(u, pairA, pairB, dist))
+				result++;
+		}
+	}
+	return result;
+}
+bool GrafoAdjacencia::bfsHopcroft(int* pairA, int* pairB, int* dist)
+{
+	list<int> Q; 
+
+	for (int u = 1; u <= conjuntos[0].size(); u++)
+	{
+		if (pairA[u] == 0)
+		{
+			dist[u] = 0;
+			Q.push_back(u);
+		}
+		else dist[u] = INT_MAX;
+	}
+
+	dist[0] = INT_MAX;
+
+	while (!Q.empty())
+	{
+		int u = Q.front();
+		Q.pop_front();
+		if (dist[u] < dist[0])
+		{
+			for (int i = 0; i < adjaListPeso[u].size(); i++)
+			{
+				int v = adjaListPeso[u][i].first;
+				if (dist[pairB[v]] == INT_MAX)
+				{
+					dist[pairB[v]] = dist[u] + 1;
+					Q.push_back(pairB[v]);
+				}
+			}
+		}
+	}
+	return (dist[0] != INT_MAX);
+}
+
+bool GrafoAdjacencia::dfsHopcroft(int u, int* pairA, int* pairB, int* dist)
+{
+	if (u != 0)
+	{
+		for (int i = 0; i < adjaListPeso[u].size(); i++)
+		{
+			int v = adjaListPeso[u][i].first;
+			if (dist[pairB[v]] == dist[u] + 1)
+			{
+				if (dfsHopcroft(pairB[v], pairA, pairB, dist) == true)
+				{
+					pairB[v] = u;
+					pairA[u] = v;
+					return true;
+				}
+			}
+		}
+		dist[u] = INT_MAX;
+		return false;
+	}
 	return true;
 }
