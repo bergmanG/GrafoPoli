@@ -173,7 +173,7 @@ bool Grafo::escrever_emparelhamento(string file) {
 		return false;
 	}
 	int emp = 0;
-	vector<pair<int, bool>>* gr = hopcraft();
+	/*vector<pair<int, bool>>* gr = hopcraft();
 	for (int i = 0; i < conjuntos[0].size(); i++) {
 		int v = conjuntos[0][i];
 		for (int j = 0; j < gr[v].size(); j++) {
@@ -182,7 +182,7 @@ bool Grafo::escrever_emparelhamento(string file) {
 				myfile << v << " " << gr[v][j].first << endl;
 			}
 		}
-	}
+	}*/
 	myfile << "Emparelhamento: " << emp;
 	myfile.close();
 	//delete gr;
